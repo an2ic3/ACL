@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: "traefik:v2.3"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=proxy"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=admin@example.de"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      # Comment out next line for non-testing scenarios
+      - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--log.format=json"
+      - "--log.level=DEBUG"
+      - "--log.filePath=/logs/traefik.log"
+      - "--accesslog=true"
+    labels:
+      # TRAEFIK DASHBOARD
+      - "traefik.enable=true"
+      - "traefik.http.services.srv_traefik.loadbalancer.server.port=8080"
+      - "traefik.http.routers.r_traefik.rule=Host(`traefik.an2ic3.de`)"
+      - "traefik.http.routers.r_traefik.entrypoints=websecure"
+      - "traefik.http.routers.r_traefik.tls=true"
+      - "traefik.http.middlewares.mw_acl_whitelist.forwardauth.address=https://acl.domain.de/check/"
+      - "traefik.http.routers.r_traefik.middlewares=mw_acl_whitelist@docker"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/srv/main/traefik/logs:/logs"
+      - "/srv/main/traefik/letsencrypt:/letsencrypt"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - 'POSTGRES_PASSWORD=SECRET_PASSWORD'
+      - 'POSTGRES_DB=acl'
+    volumes:
+      - 'postgres-data:/var/lib/postgres/data'
+
+  ldap:
+    image: osixia/openldap:1.4.0
+    restart: always
+    environment:
+      - 'LDAP_ORGANISATION=example.com'
+      - 'LDAP_DOMAIN=example.com'
+      - 'LDAP_ADMIN_PASSWORD=SECRET_PASSWORD'
+    volumes:
+      - 'ldap-data:/var/lib/ldap'
+      - 'ldap-config:/etc/ldap/slapd.d'
+
+  acl:
+    image: acl
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      - 'SQL_ENGINE=django.db.backends.postgresql'
+      - 'SQL_HOST=postgres'
+      - 'SQL_USER=postgres'
+      - 'SQL_PASSWORD=SECRET_PASSWORD'
+      - 'SQL_DATABASE=acl'
+      - 'SCHEDULE_UPDATE_TIME=300'
+      - 'LDAP_URI=ldap://ldap:389'
+      - 'LDAP_BIND_DN=cn=admin,dc=example,dc=com'
+      - 'LDAP_BIND_PASS=SECRET_PASSWORD'
+      - 'LDAP_USERS=ou=people,dc=example,dc=com'
+      - 'LDAP_GROUPS=ou=groups,dc=example,dc=com'
+      - 'LDAP_GROUP=cn=acl,ou=groups,dc=example,dc=com'
+      - 'LDAP_SUPERGROUP=cn=superuser,cn=acl,ou=groups,dc=example,dc=com'
+      - 'ALLOWED_HOSTS=acl.example.com'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.srv_acl.loadbalancer.server.port=8000"
+      - "traefik.http.routers.r_acl.rule=Host(`acl.example.com`)"
+      - "traefik.http.routers.r_acl.entrypoints=websecure"
+      - "traefik.http.routers.r_acl.tls=true"
+      - "traefik.http.routers.r_acl.tls.certresolver=myresolver"
+
+volumes:
+  postgres-data:
+  ldap-data:
+  ldap-config:
+
