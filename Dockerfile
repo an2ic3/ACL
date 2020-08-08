@@ -1,4 +1,4 @@
-FROM python:3.8.3-alpine
+FROM python:3.8.3-alpine AS compile-image
 
 # set work directory
 WORKDIR /usr/src/app
@@ -16,18 +16,24 @@ ENV DEBUG=0
 
 # install psycopg2 dependencies
 RUN apk update \
- && apk add postgresql-dev gcc python3-dev musl-dev zlib-dev build-base openldap-dev
+ && apk add postgresql-dev gcc python3-dev musl-dev jpeg-dev zlib-dev build-base openldap-dev
 
 # install dependencies
 RUN pip install --upgrade pip
 COPY ./requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --user -r requirements.txt
+
+
+FROM python:3.8.3-alpine AS build-image
+
+COPY --from=compile-image /root/.local /root/.local
 
 # copy project
 COPY . .
 
 EXPOSE 8000
-
+ENV PATH=/root/.local/bin:$PATH
 ENTRYPOINT '/usr/src/app/entrypoint.sh'
+
 # TODO use gunicorn
 CMD ['python', 'manage.py', 'runserver', '0.0.0.0:8000', '--insecure']
