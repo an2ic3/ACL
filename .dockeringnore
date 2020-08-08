@@ -1,11 +1,9 @@
 .idea
 venv
 env
-
-docker-compose.yml
-
 __pycache__
 
+docker-compose.yml
+Dockerfile
 README.md
 
-Dockerfile

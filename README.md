@@ -40,4 +40,10 @@ A ip based access control solution for [jwilder/nginx-proxy](https://github.com/
 
 
 ## TODO's
-* [multi stage build](https://pythonspeed.com/articles/multi-stage-docker-python/)
+* (Nico) [multi stage build](https://pythonspeed.com/articles/multi-stage-docker-python/)
+* (Paul) Improve LDAP search query to also enable login using common name / mail
+  ```bash
+  # hint
+  (&(|(uid=%u))(|(mail=%u))(|(cn=%u)))
+  # might work ... (something like this...)
+  ```
