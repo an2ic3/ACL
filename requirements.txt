@@ -8,4 +8,4 @@ Werkzeug==1.0.1
 dnspython==2.0.0
 docker==3.7.0
 django-auth-ldap==2.2.0
-
+apscheduler==2.1.2

@@ -9,14 +9,14 @@ ENV PYTHONUNBUFFERED 1
 
 ENV SQL_ENGINE=django.db.backends.postgresql
 ENV SQL_PORT=5432
-ENV SQL_USER=idmgr
-ENV SQL_DATABASE=idmgr
+ENV SQL_USER=acl
+ENV SQL_DATABASE=acl
 ENV ALLOWED_HOSTS='0.0.0.0'
 ENV DEBUG=0
 
 # install psycopg2 dependencies
 RUN apk update \
- && apk add postgresql-dev gcc python3-dev musl-dev
+ && apk add postgresql-dev gcc python3-dev musl-dev zlib-dev build-base openldap-dev
 
 # install dependencies
 RUN pip install --upgrade pip

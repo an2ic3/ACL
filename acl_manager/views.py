@@ -40,6 +40,9 @@ class UpdateView(View):
         except ValidationError:
             return HttpResponseBadRequest()
 
+        if ip_address == user.ip.address:
+            return HttpResponse()
+
         ip, created = IP.objects.update_or_create(user=user, defaults={'address': ip_address})
 
         services = set(Service.objects.filter(users=user)) | set(

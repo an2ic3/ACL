@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import random
+
+from string import punctuation, digits, ascii_letters
 
 import ldap
 from django_auth_ldap.config import LDAPSearch, GroupOfNamesType, GroupOfUniqueNamesType
@@ -23,18 +26,24 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'gt1q5n7h$*v9d-#qia4yna$li0j!*+n0ut%qmk3*@7z7cgl5sh'
+SECRET_KEY = os.environ.get('SECRET_KEY', repr(''.join([
+    random.SystemRandom().choice(ascii_letters + digits + punctuation) for i in range(
+        random.randint(45, 50)
+    )])
+))
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ['DEBUG']
+DEBUG = os.environ.get('DEBUG', False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1 0.0.0.0').split(' ')
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'acl_manager.apps.AclManagerConfig',
+    'domain.apps.DomainConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -81,12 +90,12 @@ WSGI_APPLICATION = 'acl.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.environ['SQL_ENGINE'],
-        'NAME': os.environ['SQL_DATABASE'],
-        'USER': os.environ['SQL_USER'],
-        'PASSWORD': os.environ['SQL_PASSWORD'],
-        'HOST': os.environ['SQL_HOST'],
-        'PORT': os.environ['SQL_PORT'],
+        'ENGINE': os.environ.get('SQL_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.environ.get('SQL_DATABASE', os.path.join(BASE_DIR, "db.sqlite3")),
+        'USER': os.environ.get('SQL_USER', 'user'),
+        'PASSWORD': os.environ.get('SQL_PASSWORD', 'password'),
+        'HOST': os.environ.get('SQL_HOST', 'localhost'),
+        'PORT': os.environ.get('SQL_PORT', '5432'),
     }
 }
 
@@ -155,7 +164,7 @@ if os.environ.get('LDAP_URI', False):
     )
     AUTH_LDAP_GROUP_TYPE = GroupOfUniqueNamesType(name_attr='cn')
 
-    AUTH_LDAP_REQUIRE_GROUP = os.environ['LDAP_USER']
+    AUTH_LDAP_REQUIRE_GROUP = os.environ['LDAP_GROUP']
 
     AUTH_LDAP_USER_ATTR_MAP = {
         'first_name': 'givenName',
@@ -164,9 +173,9 @@ if os.environ.get('LDAP_URI', False):
     }
 
     AUTH_LDAP_USER_FLAGS_BY_GROUP = {
-         'is_active': os.environ['LDAP_USER'],
-         'is_staff': os.environ['LDAP_SUPERUSER'],
-         'is_superuser': os.environ['LDAP_SUPERUSER'],
+         'is_active': os.environ['LDAP_GROUP'],
+         'is_staff': os.environ['LDAP_SUPERGROUP'],
+         'is_superuser': os.environ['LDAP_SUPERGROUP'],
     }
 
     AUTH_LDAP_GROUP_CACHE_TIMEOUT = 0
@@ -186,5 +195,5 @@ LOGGING = {
 
 
 # Custom
-SCHEDULE_UPDATE_TIME = os.environ['SCHEDULE_UPDATE_TIME'] or 300  # in seconds
+SCHEDULE_UPDATE_TIME = os.environ.get('SCHEDULE_UPDATE_TIME', 300)  # in seconds
 PROXY_CONTAINER = os.environ.get('PROXY_CONTAINER', 'main_nginx_1')
