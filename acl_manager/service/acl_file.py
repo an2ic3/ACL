@@ -1,10 +1,9 @@
-from typing import List
+from typing import Set
 
 from django.core.files.storage import FileSystemStorage
-from django.contrib.auth.models import User
 
-from ..models import Service, IP
-from  .proxy import ProxyService
+from ..models import Service
+from .proxy import ProxyService
 
 
 class ACLFileService:
@@ -15,7 +14,7 @@ class ACLFileService:
         self._fs = FileSystemStorage()
         self._proxy_service = ProxyService()
 
-    def update_include_files(self, services: List[Service]):
+    def update_include_files(self, services: Set[Service]):
         for service in services:
             self._update_include_file(service)
 

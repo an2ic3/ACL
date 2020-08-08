@@ -42,14 +42,13 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1 0.0.0.0').split(' ')
 # Application definition
 
 INSTALLED_APPS = [
-    'acl_manager.apps.AclManagerConfig',
-    'domain.apps.DomainConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'acl_manager.apps.AclManagerConfig',
 ]
 
 MIDDLEWARE = [
@@ -195,5 +194,5 @@ LOGGING = {
 
 
 # Custom
-SCHEDULE_UPDATE_TIME = os.environ.get('SCHEDULE_UPDATE_TIME', 300)  # in seconds
+SCHEDULE_UPDATE_TIME = os.environ.get('SCHEDULE_UPDATE_TIME', 15)  # in Minutes
 PROXY_CONTAINER = os.environ.get('PROXY_CONTAINER', 'main_nginx_1')

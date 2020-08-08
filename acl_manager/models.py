@@ -12,6 +12,10 @@ class IP(models.Model):
     def __str__(self):
         return self.address
 
+    def get_acl_services(self):
+        return set(Service.objects.filter(users=self.user)) | set(
+            Service.objects.filter(groups__in=self.user.groups.all())
+        )
 
 class Service(models.Model):
     name = models.CharField(max_length=128, blank=False, null=False)
@@ -34,3 +38,8 @@ class Domain(models.Model):
 
     def __str__(self):
         return self.domain
+
+    def get_acl_services(self):
+        return set(Service.objects.filter(users=self.user)) | set(
+            Service.objects.filter(groups__in=self.user.groups.all())
+        )
