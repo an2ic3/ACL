@@ -40,8 +40,8 @@ services:
     environment:
       - 'POSTGRES_PASSWORD=SECRET_PASSWORD'
       - 'POSTGRES_DB=acl'
-    #volumes:
-    #  - '/srv/main/postgres:/var/lib/postgres/data'
+    volumes:
+      - 'postgres-data:/var/lib/postgres/data'
 
   ldap:
     image: osixia/openldap:1.4.0
@@ -50,9 +50,9 @@ services:
       - 'LDAP_ORGANISATION=example.com'
       - 'LDAP_DOMAIN=example.com'
       - 'LDAP_ADMIN_PASSWORD=SECRET_PASSWORD'
-    #volumes:
-    #  - '/srv/main/ldap/data:/var/lib/ldap'
-    #  - '/srv/main/ldap/config:/etc/ldap/slapd.d'
+    volumes:
+      - 'ldap-data:/var/lib/ldap'
+      - 'ldap-config:/etc/ldap/slapd.d'
 
   acl:
     image: acl
@@ -90,3 +90,7 @@ volumes:
   nginx-webroot:
   nginx-conf.d:
   nginx-acl:
+  postgres-data:
+  ldap-data:
+  ldap-config:
+
