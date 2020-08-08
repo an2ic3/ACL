@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: jwilder/nginx-proxy
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - 'nginx-certs:/etc/nginx/certs'
+      - 'nginx-vhosts:/etc/nginx/vhost.d'
+      - '/srv/main/nginx/webroot:/usr/share/nginx/html'
+      - '/srv/main/nginx/conf.d:/etc/nginx/conf.d'
+      - 'nginx-acl:/etc/nginx/acl'
+      - '/var/run/docker.sock:/tmp/docker.sock:ro'
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+    environment:
+      - 'DEFAULT_HOST=example.com'
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    depends_on:
+      - nginx
+    environment:
+      - 'NGINX_PROXY_CONTAINER=main_nginx_1'
+      - 'DEFAULT_EMAIL=letsencrypt@example.com'
+    volumes:
+      - 'nginx-certs:/etc/nginx/certs'
+      - 'nginx-vhosts:/etc/nginx/vhost.d'
+      - '/srv/main/nginx/conf.d:/etc/nginx/conf.d'
+      - '/srv/main/nginx/webroot:/usr/share/nginx/html'
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - 'POSTGRES_PASSWORD=SECRET_PASSWORD'
+      - 'POSTGRES_DB=acl'
+    #volumes:
+    #  - '/srv/main/postgres:/var/lib/postgres/data'
+
+  ldap:
+    image: osixia/openldap:1.4.0
+    restart: always
+    environment:
+      - 'LDAP_ORGANISATION=example.com'
+      - 'LDAP_DOMAIN=example.com'
+      - 'LDAP_ADMIN_PASSWORD=SECRET_PASSWORD'
+    #volumes:
+    #  - '/srv/main/ldap/data:/var/lib/ldap'
+    #  - '/srv/main/ldap/config:/etc/ldap/slapd.d'
+
+  acl:
+    image: acl
+    restart: always
+    depends_on:
+      - nginx
+      - postgres
+    volumes:
+      - 'nginx-acl:/app/acl'
+      - '/var/run/docker.sock:/tmp/docker.sock:ro'
+    environment:
+      - 'SQL_ENGINE=django.db.backends.postgresql'
+      - 'SQL_HOST=postgres'
+      - 'SQL_USER=postgres'
+      - 'SQL_PASSWORD=SECRET_PASSWORD'
+      - 'SQL_DATABASE=acl'
+      - 'ACL_FILE_PATH=/app/acl'
+      - 'SCHEDULE_UPDATE_TIME=300'
+      - 'PROXY_CONTAINER=acl_nginx_1'
+      - 'LDAP_URI=ldap://ldap:389'
+      - 'LDAP_BIND_DN=cn=admin,dc=example,dc=com'
+      - 'LDAP_BIND_PASS=SECRET_PASSWORD'
+      - 'LDAP_USERS=ou=people,dc=example,dc=com'
+      - 'LDAP_GROUPS=ou=groups,dc=example,dc=com'
+      - 'LDAP_GROUP=cn=acl,ou=groups,dc=example,dc=com'
+      - 'LDAP_SUPERGROUP=cn=superuser,cn=acl,ou=groups,dc=example,dc=com'
+      - 'VIRTUAL_HOST=acl.example.com'
+      - 'VIRTUAL_PORT=8000'
+      - 'LETSENCRYPT_HOST=acl.example.com'
+      - 'ALLOWED_HOSTS=acl.example.com'
+
+volumes:
+  nginx-certs:
+  nginx-vhosts:
+  nginx-acl:
