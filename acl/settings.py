@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+import ldap
+from django_auth_ldap.config import LDAPSearch, GroupOfNamesType, GroupOfUniqueNamesType
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -23,7 +26,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'gt1q5n7h$*v9d-#qia4yna$li0j!*+n0ut%qmk3*@7z7cgl5sh'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ['DEBUG']
 
 ALLOWED_HOSTS = []
 
@@ -78,12 +81,12 @@ WSGI_APPLICATION = 'acl.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ['DB_DEFAULT_NAME'],
-        'USER': os.environ['DB_DEFAULT_USER'],
-        'PASSWORD': os.environ['DB_DEFAULT_PASS'],
-        'HOST': os.environ['DB_DEFAULT_HOST'],
-        'PORT': os.environ['DB_DEFAULT_PORT'],
+        'ENGINE': os.environ['SQL_ENGINE'],
+        'NAME': os.environ['SQL_DATABASE'],
+        'USER': os.environ['SQL_USER'],
+        'PASSWORD': os.environ['SQL_PASSWORD'],
+        'HOST': os.environ['SQL_HOST'],
+        'PORT': os.environ['SQL_PORT'],
     }
 }
 
@@ -131,6 +134,57 @@ MEDIA_ROOT = os.environ['ACL_FILE_PATH']
 
 APPEND_SLASH = True
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# LDAP
+if os.environ.get('LDAP_URI', False):
+    AUTH_LDAP_SERVER_URI = os.environ['LDAP_URI']
+    AUTH_LDAP_BIND_DN = os.environ['LDAP_BIND_DN']
+    AUTH_LDAP_BIND_PASSWORD = os.environ['LDAP_BIND_PASS']
+    AUTH_LDAP_USER_SEARCH = LDAPSearch(
+        os.environ['LDAP_USERS'],
+        ldap.SCOPE_SUBTREE,
+        '(uid=%(user)s)',
+    )
+    AUTH_LDAP_GROUP_SEARCH = LDAPSearch(
+        os.environ['LDAP_GROUPS'],
+        ldap.SCOPE_SUBTREE,
+        '(objectClass=groupOfUniqueNames)',
+    )
+    AUTH_LDAP_GROUP_TYPE = GroupOfUniqueNamesType(name_attr='cn')
+
+    AUTH_LDAP_REQUIRE_GROUP = os.environ['LDAP_USER']
+
+    AUTH_LDAP_USER_ATTR_MAP = {
+        'first_name': 'givenName',
+        'last_name': 'sn',
+        'email': 'mail',
+    }
+
+    AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+         'is_active': os.environ['LDAP_USER'],
+         'is_staff': os.environ['LDAP_SUPERUSER'],
+         'is_superuser': os.environ['LDAP_SUPERUSER'],
+    }
+
+    AUTH_LDAP_GROUP_CACHE_TIMEOUT = 0
+    AUTH_LDAP_CACHE_GROUPS = 0
+    AUTH_LDAP_ALWAYS_UPDATE_USER = True
+    AUTH_LDAP_FIND_GROUP_PERMS = True
+    AUTH_LDAP_CACHE_TIMEOUT = 0
+
+    AUTHENTICATION_BACKENDS += ['django_auth_ldap.backend.LDAPBackend']
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {"django_auth_ldap": {"level": "DEBUG", "handlers": ["console"]}},
+}
+
 
 # Custom
-SCHEDULE_UPDATE_TIME = os.environ['DB_DEFAULT_PORT'] or 300  # in seconds
+SCHEDULE_UPDATE_TIME = os.environ['SCHEDULE_UPDATE_TIME'] or 300  # in seconds
+PROXY_CONTAINER = os.environ.get('PROXY_CONTAINER', 'main_nginx_1')

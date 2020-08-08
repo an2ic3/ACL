@@ -3,7 +3,8 @@ from typing import List
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.models import User
 
-from ..models import Service, IP, ACL
+from ..models import Service, IP
+from  .proxy import ProxyService
 
 
 class ACLFileService:
@@ -12,14 +13,16 @@ class ACLFileService:
 
     def __init__(self):
         self._fs = FileSystemStorage()
+        self._proxy_service = ProxyService()
 
     def update_include_files(self, services: List[Service]):
         for service in services:
             self._update_include_file(service)
 
+        self._proxy_service.reload()
+
     def _update_include_file(self, service: Service):
-        ips = list(IP.objects.filter(user__acl__service=service).values_list('address', flat=True))
-        ips.extend(self._INCLUDES)
+        ips = frozenset(self._INCLUDES) | service.get_acl_ips()
 
         with self._fs.open(service.name, 'w') as f:
             for ip in ips:

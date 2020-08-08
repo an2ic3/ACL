@@ -42,7 +42,9 @@ class UpdateView(View):
 
         ip, created = IP.objects.update_or_create(user=user, defaults={'address': ip_address})
 
-        services = Service.objects.filter(acl__user=user)
+        services = set(Service.objects.filter(users=user)) | set(
+            Service.objects.filter(groups__in=user.groups.all())
+        )
         self._file_storage.update_include_files(services)
 
         return HttpResponse()
