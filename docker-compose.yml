@@ -10,8 +10,8 @@ services:
     volumes:
       - 'nginx-certs:/etc/nginx/certs'
       - 'nginx-vhosts:/etc/nginx/vhost.d'
-      - '/srv/main/nginx/webroot:/usr/share/nginx/html'
-      - '/srv/main/nginx/conf.d:/etc/nginx/conf.d'
+      - 'nginx-webroot:/usr/share/nginx/html'
+      - 'nginx-conf.d:/etc/nginx/conf.d'
       - 'nginx-acl:/etc/nginx/acl'
       - '/var/run/docker.sock:/tmp/docker.sock:ro'
     labels:
@@ -30,8 +30,8 @@ services:
     volumes:
       - 'nginx-certs:/etc/nginx/certs'
       - 'nginx-vhosts:/etc/nginx/vhost.d'
-      - '/srv/main/nginx/conf.d:/etc/nginx/conf.d'
-      - '/srv/main/nginx/webroot:/usr/share/nginx/html'
+      - 'nginx-conf.d:/etc/nginx/conf.d'
+      - 'nginx-webroot:/usr/share/nginx/html'
       - '/var/run/docker.sock:/var/run/docker.sock:ro'
 
   postgres:
@@ -87,4 +87,6 @@ services:
 volumes:
   nginx-certs:
   nginx-vhosts:
+  nginx-webroot:
+  nginx-conf.d:
   nginx-acl:
