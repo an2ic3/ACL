@@ -15,8 +15,6 @@ import random
 
 from string import punctuation, digits, ascii_letters
 
-import ldap
-from django_auth_ldap.config import LDAPSearch, GroupOfUniqueNamesType
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -134,7 +132,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = os.environ.get('STATIC_URL', '/static/')
+STATIC_ROOT = 'static/'
 
 MEDIA_ROOT = os.environ['ACL_FILE_PATH']
 
@@ -147,6 +146,9 @@ AUTHENTICATION_BACKENDS = [
 
 # LDAP
 if os.environ.get('LDAP_URI', False):
+    import ldap
+    from django_auth_ldap.config import LDAPSearch, GroupOfUniqueNamesType
+
     AUTH_LDAP_SERVER_URI = os.environ['LDAP_URI']
     AUTH_LDAP_BIND_DN = os.environ['LDAP_BIND_DN']
     AUTH_LDAP_BIND_PASSWORD = os.environ['LDAP_BIND_PASS']
