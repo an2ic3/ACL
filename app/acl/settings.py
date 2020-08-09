@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app.acl_manager.apps.AclManagerConfig',
+    'acl_manager.apps.AclManagerConfig',
 ]
 
 MIDDLEWARE = [
@@ -57,7 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'app.middleware.basicauth.BasicAuthMiddleware'
+    'middleware.basicauth.BasicAuthMiddleware'
 ]
 
 ROOT_URLCONF = 'acl.urls'
