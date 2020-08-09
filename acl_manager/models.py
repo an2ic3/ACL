@@ -17,6 +17,7 @@ class IP(models.Model):
             Service.objects.filter(groups__in=self.user.groups.all())
         )
 
+
 class Service(models.Model):
     name = models.CharField(max_length=128, blank=False, null=False)
     users = models.ManyToManyField(User, related_name="service", blank=True)

@@ -67,8 +67,7 @@ ROOT_URLCONF = 'acl.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -172,9 +171,9 @@ if os.environ.get('LDAP_URI', False):
     }
 
     AUTH_LDAP_USER_FLAGS_BY_GROUP = {
-         'is_active': os.environ['LDAP_GROUP'],
-         'is_staff': os.environ['LDAP_SUPERGROUP'],
-         'is_superuser': os.environ['LDAP_SUPERGROUP'],
+        'is_active': os.environ['LDAP_GROUP'],
+        'is_staff': os.environ['LDAP_SUPERGROUP'],
+        'is_superuser': os.environ['LDAP_SUPERGROUP'],
     }
 
     AUTH_LDAP_GROUP_CACHE_TIMEOUT = 0
