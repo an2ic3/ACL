@@ -5,7 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 
 class AclManagerConfig(AppConfig):
-    name = 'acl_manager'
+    name = 'app.acl_manager'
 
     def ready(self):
         from .service import dns_updater

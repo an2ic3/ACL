@@ -4,7 +4,7 @@ A ip based access control solution for [jwilder/nginx-proxy](https://github.com/
 ## Setup Instructions
 * Build ACL
   ```bash
-  $ sudo docker build -t acl .
+  $ sudo docker build -t acl -f app/Dockerfile app
   ```
 
 * Modify [`docker-compose.yml`](./docker-compose.yml) (e.g. setting secure passwords, replacing `example` with your actual domain name and `com` with your actual top level domain)

@@ -1,9 +1,0 @@
-.idea
-venv
-env
-__pycache__
-
-docker-compose.yml
-Dockerfile
-README.md
-

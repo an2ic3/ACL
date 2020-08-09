@@ -8,6 +8,8 @@ if [ "${SQL_ENGINE}" != "django.db.backends.sqlite3" ]; then
         sleep 0.1
     done
 
+    # TODO test auth
+
     echo "${dbms} started"
 fi
 
@@ -15,7 +17,7 @@ python manage.py migrate
 
 # shellcheck disable=SC2198
 if [ -z "${@}" ]; then
-  python manage.py runserver 0.0.0.0:8000
+  gunicorn acl.wsgi:application --bind 0.0.0.0:8000
 else
-  python manage.py "${@}"
+  exec "${@}"
 fi
