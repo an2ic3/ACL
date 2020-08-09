@@ -16,7 +16,7 @@ import random
 from string import punctuation, digits, ascii_letters
 
 import ldap
-from django_auth_ldap.config import LDAPSearch, GroupOfNamesType, GroupOfUniqueNamesType
+from django_auth_ldap.config import LDAPSearch, GroupOfUniqueNamesType
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

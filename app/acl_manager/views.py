@@ -3,7 +3,7 @@ from django.views import View
 from django.core.validators import validate_ipv46_address
 from django.core.exceptions import ValidationError
 
-from .models import IP, Service, Domain
+from .models import IP, Domain
 from .service.acl_file import ACLFileService
 from .service.dns_lookup import DNSLookupService
 
