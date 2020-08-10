@@ -32,7 +32,7 @@ class ACLFileService:
                 f.write(self._str_deny(ip))
 
     def _str_allow(self, ip: str):
-        return f'allow {ip}\n'
+        return f'allow {ip};\n'
 
     def _str_deny(self, ip: str):
-        return f'deny {ip}\n'
+        return f'deny {ip};\n'
