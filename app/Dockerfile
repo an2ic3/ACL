@@ -35,10 +35,6 @@ ENV APP_HOME=/home/app/web
 RUN mkdir $APP_HOME
 WORKDIR $APP_HOME
 
-# create media dir and persist it
-RUN mkdir -p "${APP_HOME}/media"
-VOLUME ['media']
-
 # install dependencies
 RUN apk update \
  && apk add libpq build-base openldap-dev
