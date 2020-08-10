@@ -25,6 +25,8 @@ class ACLFileService:
 
         with self._fs.open(service.name, 'w') as f:
             for ip in ips:
+                if not ip:
+                    continue
                 f.write(self._str_allow(ip))
             for ip in self._EXCLUDES:
                 f.write(self._str_deny(ip))

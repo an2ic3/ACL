@@ -186,12 +186,12 @@ if os.environ.get('LDAP_URI', False):
 
     AUTHENTICATION_BACKENDS += ['django_auth_ldap.backend.LDAPBackend']
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {"console": {"class": "logging.StreamHandler"}},
-    "loggers": {"django_auth_ldap": {"level": "DEBUG", "handlers": ["console"]}},
-}
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {"console": {"class": "logging.StreamHandler"}},
+        "loggers": {"django_auth_ldap": {"level": "INFO", "handlers": ["console"]}},
+    }
 
 
 # Custom

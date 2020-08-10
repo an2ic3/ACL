@@ -40,8 +40,9 @@ class UpdateView(View):
         except ValidationError:
             return HttpResponseBadRequest()
 
-        if ip_address == user.ip.address:
-            return HttpResponse()
+        if hasattr(user, "ip"):
+            if ip_address == user.ip.address:
+                return HttpResponse()
 
         ip, created = IP.objects.update_or_create(user=user, defaults={'address': ip_address})
 
@@ -49,4 +50,4 @@ class UpdateView(View):
 
         self._file_storage.update_include_files(services)
 
-        return HttpResponse()
+        return HttpResponse(ip_address)
