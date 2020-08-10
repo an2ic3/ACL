@@ -50,4 +50,6 @@ RUN chown -R app:app $APP_HOME
 
 ENTRYPOINT "${APP_HOME}/entrypoint.sh"
 EXPOSE 8000
-USER app
+
+# USER app
+# TODO user app has no permission to use unix socket: docker.sock
