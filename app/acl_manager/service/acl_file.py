@@ -7,7 +7,7 @@ from .proxy import ProxyService
 
 
 class ACLFileService:
-    _INCLUDES = ('10/8', '127/8', '172.16/12', '192.168/16')
+    _INCLUDES = ('10.0.0.0/8', '127.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16')
     _EXCLUDES = ('all',)
 
     def __init__(self):
