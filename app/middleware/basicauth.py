@@ -20,7 +20,9 @@ class BasicAuthMiddleware:
 
         try:
             if not (auth_header := request.headers.get('Authorization', None)):
-                raise ValueError
+                response = HttpResponse(status=401)
+                response['WWW-Authenticate'] = 'Basic realm="ACL"'
+                return response
             _, basic_auth = auth_header.split(' ')
             username, passwd = base64.b64decode(basic_auth).decode().split(':')
         except (ValueError, binascii.Error):
