@@ -30,7 +30,7 @@ ENV DEBUG=0
 # create the app user
 RUN mkdir -p /home/app
 RUN addgroup -g 998 docker
-RUN adduser -S app && adduser -S app -G docker
+RUN addgroup -S app && adduser -S app -G app -G docker
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
 RUN mkdir $APP_HOME
