@@ -29,7 +29,8 @@ ENV DEBUG=0
 
 # create the app user
 RUN mkdir -p /home/app
-RUN addgroup -S app && adduser -S app -G app
+RUN addgroup -g 998 docker
+RUN adduser -S app && adduser -S app -G docker
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
 RUN mkdir $APP_HOME
@@ -50,6 +51,4 @@ RUN chown -R app:app $APP_HOME
 
 ENTRYPOINT "${APP_HOME}/entrypoint.sh"
 EXPOSE 8000
-
-# USER app
-# TODO user app has no permission to use unix socket: docker.sock
+USER app
