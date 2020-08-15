@@ -7,6 +7,15 @@ A ip based access control solution for [jwilder/nginx-proxy](https://github.com/
   $ sudo docker build -t acl app
   ```
 
+* Export static files (you need to provide them using a nginx)
+  ```bash
+  $ sudo docker run --rm -u0 \
+      -e 'ACL_FILE_PATH=.' \
+      -v '/srv/main/nginx/webroot/static.acl.example.com:/home/app/web/static' \
+      --entrypoint='/home/app/web/manage.py'
+      acl 'collectstatic --no-input'
+  ```
+
 * Modify [`docker-compose.yml`](./docker-compose.yml) (e.g. setting secure passwords, replacing `example` with your actual domain name and `com` with your actual top level domain)
 
 * Start all services
