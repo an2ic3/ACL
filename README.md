@@ -41,7 +41,7 @@ A ip based access control solution for [jwilder/nginx-proxy](https://github.com/
 
 
 ## Simple Update
-```
+```bash
 #!/bin/bash
 
 IP=$(curl -q ifconfig.co 2> /dev/null)
