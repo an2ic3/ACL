@@ -40,6 +40,27 @@ A ip based access control solution for [jwilder/nginx-proxy](https://github.com/
 | LDAP_SUPERGROUP      | DN of LDAP Group, which users need to be member of to administrate the acl - e.g. cn=superuser,cn=acl,ou=groups,dc=example,dc=com |                               |
 
 
+## Simple Update
+```
+#!/bin/bash
+
+IP=$(curl -q ifconfig.co 2> /dev/null)
+USER="user"
+API="acl.example.com"
+
+read -sp "Password: " PASS
+echo
+
+one=$(curl "https://${USER}:${PASS}@${API}/update/?ip=1.1.1.1" 2> /dev/null)
+if [ -z ${one} ]; then
+  echo "Authentication failed!"
+  exit 1
+fi
+current=$(curl "https://${USER}:${PASS}@${API}/update/?ip=${IP}" 2> /dev/null)
+echo "${current} has been set for ${USER}@${API}"
+```
+
+
 ## TODO's
 * (Paul) Improve LDAP search query to also enable login using common name / mail
   ```bash
