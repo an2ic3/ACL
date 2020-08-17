@@ -9,7 +9,16 @@ from .service.acl_file import ACLFileService
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
     filter_horizontal = ('users', 'groups')
-    required = False
+
+    def save_model(self, request, obj, form, change):
+        obj.user = request.user
+        for attr in form.changed_data:
+            getattr(obj, attr).set(form.cleaned_data[attr])
+        super().save_model(request, obj, form, change)
+
+        if form.changed_data:
+            file_service = ACLFileService()
+            file_service.update_include_files({obj})
 
 
 class IPInLine(admin.TabularInline):
@@ -31,7 +40,7 @@ class GroupServiceInline(admin.TabularInline):
 
 
 class CustomUserAdmin(UserAdmin):
-    filter_horizontal = ('service',)
+    filter_horizontal = ('service', 'groups')
     inlines = (
         IPInLine,
         DomainInLine,

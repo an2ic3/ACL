@@ -1,6 +1,8 @@
 from typing import Set
 
 from django.core.files.storage import FileSystemStorage
+from django.db.models.signals import post_save, post_delete, pre_save
+from django.dispatch import receiver
 
 from ..models import Service
 from .proxy import ProxyService
@@ -36,3 +38,12 @@ class ACLFileService:
 
     def _str_deny(self, ip: str):
         return f'deny {ip};\n'
+
+    def delete_service(self, service: Service):
+        self._fs.delete(service.name)
+
+
+@receiver(post_delete, sender=Service)
+def delete_service(sender, **kwargs):
+    file_service = ACLFileService()
+    file_service.delete_service(kwargs.get("instance"))
