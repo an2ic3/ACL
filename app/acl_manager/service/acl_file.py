@@ -1,10 +1,10 @@
 from typing import Set
 
 from django.core.files.storage import FileSystemStorage
-from django.db.models.signals import post_save, post_delete, pre_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
-from ..models import Service
+from ..models import Service, Group, User
 from .proxy import ProxyService
 
 
@@ -19,8 +19,7 @@ class ACLFileService:
     def update_include_files(self, services: Set[Service]):
         for service in services:
             self._update_include_file(service)
-
-        self._proxy_service.reload()
+        self._reload_proxy()
 
     def _update_include_file(self, service: Service):
         ips = frozenset(self._INCLUDES) | service.get_acl_ips()
@@ -39,8 +38,12 @@ class ACLFileService:
     def _str_deny(self, ip: str):
         return f'deny {ip};\n'
 
+    def _reload_proxy(self):
+        self._proxy_service.reload()
+
     def delete_service(self, service: Service):
         self._fs.delete(service.name)
+        self._reload_proxy()
 
 
 @receiver(post_delete, sender=Service)
