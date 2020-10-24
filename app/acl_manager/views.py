@@ -54,10 +54,10 @@ class AuthView(View):
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
 
-        if not (ip_header := request.headers.get("X-Forwared-For")):
+        if not (ip_header := request.headers.get("X-Forwarded-For")):
             return HttpResponseBadRequest()
 
-        if not (host := request.headers.get("Host")):
+        if not (host := request.headers.get("X-Forwarded-Host")):
             return HttpResponseBadRequest()
 
         if len(ip_header.split(",")) == 0:
@@ -73,7 +73,7 @@ class AuthView(View):
         user_query_set = User.objects.filter(ip__address=ip_address)
 
         for user in user_query_set.all():
-            if user.service.filter(name=host).exists():
+            if user.service.filter(name__iexactgit stat8is=host).exists():
                 return HttpResponse()
 
         return HttpResponseForbidden()
