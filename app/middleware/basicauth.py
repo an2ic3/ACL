@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate
 
 
 class BasicAuthMiddleware:
-    _EXCLUDED_URLS = ('admin:index', )
+    _EXCLUDED_URLS = ('admin:index', 'auth')
 
     def __init__(self, get_response):
         self.get_response = get_response
