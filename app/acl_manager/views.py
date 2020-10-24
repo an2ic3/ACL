@@ -73,7 +73,7 @@ class AuthView(View):
         user_query_set = User.objects.filter(ip__address=ip_address)
 
         for user in user_query_set.all():
-            if user.service.filter(name__iexactgit stat8is=host).exists():
+            if user.service.filter(name__iexact=host).exists():
                 return HttpResponse()
 
         return HttpResponseForbidden()
