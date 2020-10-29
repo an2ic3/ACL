@@ -67,11 +67,13 @@ echo "${current} has been set for ${USER}@${API}"
 ```
 
 
-## TODO's
+## TODO
 * (Paul) Improve LDAP search query to also enable login using common name / mail
   ```bash
   # hint
   (&(|(uid=%u))(|(mail=%u))(|(cn=%u)))
   # might work ... (something like this...)
   ```
-* Remove unused environemnt variables (for the old nginx version of the acl)
+* Remove unused environment variables (for the old nginx version of the acl)
+* Add Identity Management (A page where the user can change his Password, Public Key and see in which groups he's in)
+* Import LDAP Users on Basic Auth - not only on Admin Login
