@@ -135,8 +135,6 @@ USE_TZ = True
 STATIC_URL = os.environ.get('STATIC_URL', '/static/')
 STATIC_ROOT = 'static/'
 
-MEDIA_ROOT = os.environ['ACL_FILE_PATH']
-
 
 APPEND_SLASH = True
 
@@ -196,4 +194,3 @@ if os.environ.get('LDAP_URI', False):
 
 # Custom
 SCHEDULE_UPDATE_TIME = os.environ.get('SCHEDULE_UPDATE_TIME', 15)  # in Minutes
-PROXY_CONTAINER = os.environ.get('PROXY_CONTAINER', 'main_nginx_1')
