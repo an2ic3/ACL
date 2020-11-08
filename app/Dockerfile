@@ -49,7 +49,7 @@ COPY . $APP_HOME
 # chown all the files to the app user
 RUN chown -R app:app $APP_HOME
 
-CMD chmod +x ${APP_HOME}/entrypoint.sh
+RUN chmod +x ${APP_HOME}/entrypoint.sh
 ENTRYPOINT "${APP_HOME}/entrypoint.sh"
 EXPOSE 8000
 USER app
