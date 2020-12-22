@@ -92,6 +92,9 @@ DATABASES = {
         'PASSWORD': os.environ.get('SQL_PASSWORD', 'password'),
         'HOST': os.environ.get('SQL_HOST', 'localhost'),
         'PORT': os.environ.get('SQL_PORT', '5432'),
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        } if os.environ.get('SQL_ENGINE') in ('django.db.backends.mariadb', 'django.db.backends.mysql') else {}
     }
 }
 
