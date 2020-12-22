@@ -26,13 +26,9 @@ RUN if [[ "${AUTH}" == "openldap" ]]; then pip wheel --no-cache-dir --no-deps --
 FROM python:3.9.0-alpine
 ARG DBMS
 ARG AUTH
+ENV DBMS=${DBMS}
 
 # app config
-RUN if [[ "${DBMS}" == "sqlite3" ]]; then export SQL_ENGINE=django.db.backends.sqlite3; fi
-RUN if [[ "${DBMS}" == "mariadb" ]]; then export SQL_ENGINE=django.db.backends.mysql; fi
-RUN if [[ "${DBMS}" == "postgres" ]]; then export SQL_ENGINE=django.db.backends.postgres; fi
-RUN if [[ "${DBMS}" == "mariadb" ]]; then export SQL_PORT=3306; fi
-RUN if [[ "${DBMS}" == "postgres" ]]; then export SQL_PORT=5432; fi
 ENV SQL_USER=acl SQL_DATABASE=acl ALLOWED_HOSTS='0.0.0.0' DEBUG=0
 
 # create the app user and directories

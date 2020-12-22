@@ -1,5 +1,25 @@
 #!/bin/sh
 
+# set environment variables for database configuration (engine / port)
+case ${DBMS} in
+"mariadb")
+  export SQL_ENGINE=django.db.backends.mysql
+  export SQL_PORT=3306
+  ;;
+"postgres")
+  export SQL_ENGINE=django.db.backends.postgres
+  export SQL_PORT=5432
+  ;;
+"sqlite3")
+  export SQL_ENGINE=django.db.backends.sqlite3
+  ;;
+*)
+  echo "Error DBMS=${DBMS} is undefined!"
+  exit 1
+  ;;
+esac
+
+# wait for database
 if [ "${SQL_ENGINE}" != "django.db.backends.sqlite3" ]; then
     dbms="${SQL_ENGINE##*.}"
     echo "Waiting for ${dbms}..."
