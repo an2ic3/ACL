@@ -37,7 +37,11 @@ python manage.py migrate
 
 # shellcheck disable=SC2198
 if [ -z "${@}" ]; then
-  gunicorn acl.wsgi:application --bind 0.0.0.0:8000 --log-level DEBUG
+  if [ "${DEBUG}" ]; then
+    gunicorn idm.wsgi:application --bind 0.0.0.0:8000 --log-level DEBUG
+  else
+    gunicorn idm.wsgi:application --bind 0.0.0.0:8000
+  fi
 else
   exec "${@}"
 fi
