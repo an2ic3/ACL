@@ -1,5 +1,12 @@
 #!/bin/sh
 
+# check if required environment variables exist:
+# shellcheck disable=SC2153
+if [ -z "${SQL_HOST}" ]; then
+  echo "You need to specify SQL_HOST"
+  exit 1
+fi
+
 # set environment variables for database configuration (engine / port)
 case ${DBMS} in
 "mariadb")

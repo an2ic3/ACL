@@ -12,7 +12,6 @@ RUN apk update \
  && apk add gcc python3-dev musl-dev jpeg-dev zlib-dev
 
 # install database dependencies
-RUN if [[ "${DBMS}" == "mariadb" ]]; then apk add mariadb-dev; fi
 RUN if [[ "${DBMS}" == "postgres" ]]; then apk add postgresql-dev; fi
 RUN if [[ "${AUTH}" == "openldap" ]]; then apk add build-base openldap-dev; fi
 
@@ -45,7 +44,6 @@ RUN apk update \
  && apk add libpq
 
 # install database dependencies
-RUN if [[ "${DBMS}" == "mariadb" ]]; then apk add mariadb-dev; fi
 RUN if [[ "${DBMS}" == "postgres" ]]; then apk add postgresql-dev; fi
 RUN if [[ "${AUTH}" == "openldap" ]]; then apk add build-base openldap-dev; fi
 
