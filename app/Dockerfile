@@ -1,12 +1,12 @@
 ARG DBMS="mariadb"
 ARG AUTH="openldap"
 
-FROM python:3.9.0-alpine as builder
+FROM python:3.9-alpine as builder
 ARG DBMS
 ARG AUTH
 
 # set work directory
-WORKDIR /usr/src/app
+WORKDIR /build
 
 RUN apk update \
  && apk add gcc python3-dev musl-dev jpeg-dev zlib-dev
@@ -17,12 +17,15 @@ RUN if [[ "${AUTH}" == "openldap" ]]; then apk add build-base openldap-dev; fi
 
 # install dependencies
 COPY rqmts/ rqmts
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r rqmts/requirements.txt
-RUN if [[ "${DBMS}" == "postgres" ]]; then pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r rqmts/requirements.postgres.txt; fi
-RUN if [[ "${DBMS}" == "mariadb" ]]; then pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r rqmts/requirements.mariadb.txt; fi
-RUN if [[ "${AUTH}" == "openldap" ]]; then pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r rqmts/requirements.openldap.txt; fi
 
-FROM python:3.9.0-alpine
+RUN cp rqmts/requirements.txt requirements.txt; \
+    if [[ "${DBMS}" == "postgres" ]]; then cat rqmts/requirements.postgres.txt >> requirements.txt; fi; \
+    if [[ "${DBMS}" == "mariadb" ]]; then cat rqmts/requirements.mariadb.txt >> requirements.txt; fi; \
+    if [[ "${AUTH}" == "openldap" ]]; then cat rqmts/requirements.openldap.txt >> requirements.txt; fi;
+
+RUN pip install --prefix=/build/venv -r requirements.txt
+
+FROM python:3.9-alpine
 ARG DBMS
 ARG AUTH
 ENV DBMS=${DBMS}
@@ -39,16 +42,11 @@ RUN mkdir -p $HOME \
  && mkdir -p "${APP_HOME}/app/media"
 WORKDIR $APP_HOME
 
-# install dependencies
-RUN apk update \
- && apk add libpq
-
 # install database dependencies
-RUN if [[ "${DBMS}" == "postgres" ]]; then apk add postgresql-dev; fi
-RUN if [[ "${AUTH}" == "openldap" ]]; then apk add build-base openldap-dev; fi
+RUN if [[ "${DBMS}" == "postgres" ]]; then apk add --no-cache libpq; fi
+RUN if [[ "${AUTH}" == "openldap" ]]; then apk add --no-cache libldap; fi
 
-COPY --from=builder /usr/src/app/wheels /wheels
-RUN pip install --no-cache /wheels/*
+COPY --from=builder /build/venv/ /usr/local/
 
 # copy project
 COPY . $APP_HOME

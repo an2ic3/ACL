@@ -3,6 +3,9 @@ from django.views import View
 from django.core.validators import validate_ipv46_address
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+import binascii
+import base64
 
 from .models import IP, Domain
 from .service.dns_lookup import DNSLookupService
@@ -50,7 +53,7 @@ class UpdateView(View):
         return HttpResponse(ip_address)
 
 
-class AuthView(View):
+class ACLAuthView(View):
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
 
@@ -77,3 +80,10 @@ class AuthView(View):
                 return HttpResponse()
 
         return HttpResponseForbidden()
+
+
+class BasicAuthView(View):
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+
+        return HttpResponse()
