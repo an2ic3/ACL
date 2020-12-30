@@ -60,7 +60,7 @@ jobs:
           MYSQL_RANDOM_ROOT_PASSWORD: true
           MYSQL_USER: acl
           MYSQL_PASSWORD: SECRET_PASSWORD
-          MYSQL_DATABASE: test_acl
+          MYSQL_DATABASE: acl
 
       postgres:
         image: postgres
