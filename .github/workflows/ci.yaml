@@ -156,7 +156,7 @@ jobs:
           LDAP_GROUPS: cn=admin,dc=domain,dc=tld
           LDAP_GROUP: cn=admin,dc=domain,dc=tld
           LDAP_SUPERGROUP: cn=admin,dc=domain,dc=tld
-        run: python app/manage.py test app/id --no-input --settings acl.settings
+        run: python app/manage.py test app/acl --no-input --settings acl.settings
 
   docker:
     needs: [ test, lint ]
