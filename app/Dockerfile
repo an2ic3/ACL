@@ -16,8 +16,6 @@ RUN if [[ "${DBMS}" == "postgres" ]]; then apk add postgresql-dev; fi
 RUN if [[ "${AUTH}" == "openldap" ]]; then apk add build-base openldap-dev; fi
 
 # install dependencies
-RUN pip install pipenv
-
 COPY rqmts/ rqmts
 
 RUN set -ex; \
@@ -26,9 +24,7 @@ RUN set -ex; \
     [[ "${DBMS}" == "mariadb" ]] && cat rqmts/requirements.mariadb.txt >> requirements.txt; \
     [[ "${AUTH}" == "openldap" ]] && cat rqmts/requirements.openldap.txt >> requirements.txt;
 
-ARG PIPENV_NOSPIN=true
-ARG PIPENV_VENV_IN_PROJECT=true
-RUN pipenv install --skip-lock -r requirements.txt
+RUN pip install --prefix=/build/venv -r requirements.txt
 
 FROM python:3.9.0-alpine
 ARG DBMS
@@ -51,7 +47,7 @@ WORKDIR $APP_HOME
 RUN if [[ "${DBMS}" == "postgres" ]]; then apk add --no-cache libpq; fi
 RUN if [[ "${AUTH}" == "openldap" ]]; then apk add --no-cache libldap; fi
 
-COPY --from=builder /build/.venv/lib /usr/local/lib
+COPY --from=builder /build/venv/ /usr/local/
 
 # copy project
 COPY . $APP_HOME
