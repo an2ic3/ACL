@@ -18,11 +18,10 @@ RUN if [[ "${AUTH}" == "openldap" ]]; then apk add build-base openldap-dev; fi
 # install dependencies
 COPY rqmts/ rqmts
 
-RUN set -ex; \
-    cp rqmts/requirements.txt requirements.txt; \
-    [[ "${DBMS}" == "postgres" ]] && cat rqmts/requirements.postgres.txt >> requirements.txt; \
-    [[ "${DBMS}" == "mariadb" ]] && cat rqmts/requirements.mariadb.txt >> requirements.txt; \
-    [[ "${AUTH}" == "openldap" ]] && cat rqmts/requirements.openldap.txt >> requirements.txt;
+RUN cp rqmts/requirements.txt requirements.txt; \
+    if [[ "${DBMS}" == "postgres" ]]; then cat rqmts/requirements.postgres.txt >> requirements.txt; fi; \
+    if [[ "${DBMS}" == "mariadb" ]]; then cat rqmts/requirements.mariadb.txt >> requirements.txt; fi; \
+    if [[ "${AUTH}" == "openldap" ]]; then cat rqmts/requirements.openldap.txt >> requirements.txt; fi;
 
 RUN pip install --prefix=/build/venv -r requirements.txt
 
