@@ -166,8 +166,6 @@ jobs:
         dbms: [ 'sqlite3', 'mariadb', 'postgres' ]
         auth: [ 'local', 'openldap' ]
 
-    if: github.event_name != 'pull_request'
-
     steps:
       - uses: actions/checkout@v2
 
@@ -221,7 +219,7 @@ jobs:
           context: app
           file: app/Dockerfile
           platforms: ${{ env.DOCKER_PLATFORMS }}
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_gentags.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           build-args: |
