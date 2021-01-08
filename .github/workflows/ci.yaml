@@ -7,6 +7,7 @@ on:
   pull_request:
 
 env:
+  # TODO adjust IMAGE_NAME
   IMAGE_NAME: felbinger/acl
   DOCKER_PLATFORMS: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
   PYTHON_VERSION: 3.9
@@ -58,23 +59,23 @@ jobs:
           - "3306:3306"
         env:
           MYSQL_RANDOM_ROOT_PASSWORD: true
-          MYSQL_USER: acl
+          MYSQL_USER: app
           MYSQL_PASSWORD: SECRET_PASSWORD
-          MYSQL_DATABASE: acl
+          MYSQL_DATABASE: app
 
       postgres:
         image: postgres
         ports:
           - "5432:5432"
         env:
-          POSTGRES_USER: acl
+          POSTGRES_USER: app
           POSTGRES_PASSWORD: SECRET_PASSWORD
-          POSTGRES_DB: acl
+          POSTGRES_DB: app
 
       ldap:
         image: howardlau1999/openldap-bcrypt
         env:
-          LDAP_ORGANISATIOn: Company Name
+          LDAP_ORGANISATION: Company Name
           LDAP_DOMAIN: domain.tld
           LDAP_ADMIN_PASSWORD: SECRET_PASSWORD
 
@@ -146,9 +147,9 @@ jobs:
           DBMS: ${{ matrix.dbms }}
           SQL_ENGINE: ${{ steps.gen-env.outputs.engine }}
           SQL_PORT: ${{ steps.gen-env.outputs.port }}
-          SQL_USER: acl
+          SQL_USER: app
           SQL_PASSWORD: SECRET_PASSWORD
-          SQL_DATABASE: acl
+          SQL_DATABASE: app
           LDAP_URI: ${{ steps.gen-env.outputs.ldap_uri }}
           LDAP_BIND_DN: cn=admin,dc=domain,dc=tld
           LDAP_BIND_PASS: SECRET_PASSWORD
@@ -156,7 +157,7 @@ jobs:
           LDAP_GROUPS: cn=admin,dc=domain,dc=tld
           LDAP_GROUP: cn=admin,dc=domain,dc=tld
           LDAP_SUPERGROUP: cn=admin,dc=domain,dc=tld
-        run: python app/manage.py test app/acl --no-input --settings acl.settings
+        run: python app/manage.py test --no-input --settings acl.settings
 
   docker:
     needs: [ test, lint ]
@@ -165,6 +166,8 @@ jobs:
       matrix:
         dbms: [ 'sqlite3', 'mariadb', 'postgres' ]
         auth: [ 'local', 'openldap' ]
+
+    if: github.event_name != 'pull_request'
 
     steps:
       - uses: actions/checkout@v2
@@ -187,12 +190,9 @@ jobs:
           if [ "${authprovider}" == "local" ]; then
             authprovider="localauth"
           fi
-          tags=$(echo -e ${{steps.docker_meta.outputs.tags }} | sed -ne "s/$/-${{ matrix.dbms }}-${authprovider}&/p")
-          if [[ "${{ matrix.dbms == 'mariadb' && matrix.auth == 'openldap' && contains(steps.docker_meta.outputs.text, 'latest') }}" == "true" ]]; then
-            tags="${tags}\nlatest"
-          fi
-          if [[ "${{ matrix.dbms == 'mariadb' && matrix.auth == 'openldap' && contains(steps.docker_meta.outputs.text, 'edge') }}" == "true" ]]; then
-            tags="${tags}\nedge"
+          tags=$(echo -e ${{steps.docker_meta.outputs.tags}} | sed -ne "s/$/-${{ matrix.dbms }}-${authprovider}&/p" | tr "\n" "," | sed 's/\(.*\),/\1/')
+          if [[ "${{ matrix.dbms == 'mariadb' && matrix.auth == 'openldap' }}" == "true" ]]; then
+            tags="${tags},${{steps.docker_meta.outputs.tags}}"
           fi
           echo ::set-output name=tags::"$tags"
 
@@ -219,8 +219,8 @@ jobs:
           context: app
           file: app/Dockerfile
           platforms: ${{ env.DOCKER_PLATFORMS }}
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.docker_gentags.outputs.tags }}
+          push: false # true
+          tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           build-args: |
             AUTH=${{ matrix.auth }}
