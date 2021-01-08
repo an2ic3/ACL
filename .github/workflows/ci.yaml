@@ -172,17 +172,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Docker meta
-        id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
-        with:
-          tag-edge: true
-          images: |
-            ghcr.io/${{ env.IMAGE_NAME }}
-          tag-semver: |
-            {{version}}
-            {{major}}.{{minor}}
-
       - name: Generate docker images tags
         id: docker_gentags
         run: |
@@ -190,11 +179,26 @@ jobs:
           if [ "${authprovider}" == "local" ]; then
             authprovider="localauth"
           fi
-          tags=$(echo -e ${{steps.docker_meta.outputs.tags}} | sed -ne "s/$/-${{ matrix.dbms }}-${authprovider}&/p" | tr "\n" "," | sed 's/\(.*\),/\1/')
-          if [[ "${{ matrix.dbms == 'mariadb' && matrix.auth == 'openldap' }}" == "true" ]]; then
-            tags="${tags},${{steps.docker_meta.outputs.tags}}"
-          fi
-          echo ::set-output name=tags::"$tags"
+          echo ::set-output name=authprovider::"$authprovider"
+          
+          #tags=$(echo -e ${{steps.docker_meta.outputs.tags}} | sed -ne "s/$/-${{ matrix.dbms }}-${authprovider}&/p" | tr "\n" "," | sed 's/\(.*\),/\1/')
+          #if [[ "${{ matrix.dbms == 'mariadb' && matrix.auth == 'openldap' }}" == "true" ]]; then
+          #  tags="${tags},${{steps.docker_meta.outputs.tags}}"
+          #fi
+          #echo ::set-output name=tags::"$tags"
+
+      - name: Docker meta
+        id: docker_meta
+        uses:  hugopeixoto/ghaction-docker-meta@feature/add-flavor
+        with:
+          tag-edge: true
+          images: |
+            ghcr.io/${{ env.IMAGE_NAME }}
+          tag-semver: |
+            {{version}}
+            {{major}}.{{minor}}
+          flavor: ${{ matrix.dbms }}-${{ steps.docker_gentags.outputs.authprovider }}
+          main-flavor: ${{ matrix.dbms == 'mariadb' && matrix.auth == 'openldap' }}
 
       - uses: docker/setup-qemu-action@v1
       - uses: docker/setup-buildx-action@v1
