@@ -223,7 +223,7 @@ jobs:
           context: app
           file: app/Dockerfile
           platforms: ${{ env.DOCKER_PLATFORMS }}
-          push: false # true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           build-args: |
@@ -236,6 +236,9 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
       - name: Check manifest
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
-          docker buildx imagetools inspect ghcr.io/${{ env.IMAGE_NAME }}:${{ steps.docker_meta.outputs.version }}
+          docker buildx imagetools inspect ghcr.io/${{ env.IMAGE_NAME }}:${{ steps.docker_meta.outputs.version }}-${{ matrix.dbms }}-${{ steps.docker_gentags.outputs.authprovider }}
+
