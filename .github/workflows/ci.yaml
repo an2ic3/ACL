@@ -8,7 +8,7 @@ on:
 
 env:
   # TODO adjust IMAGE_NAME
-  IMAGE_NAME: felbinger/acl
+  IMAGE_NAME: an2ic3/acl
   DOCKER_PLATFORMS: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
   PYTHON_VERSION: 3.9
 
