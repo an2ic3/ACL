@@ -14,7 +14,7 @@ case ${DBMS} in
   export SQL_PORT=3306
   ;;
 "postgres")
-  export SQL_ENGINE=django.db.backends.postgres
+  export SQL_ENGINE=django.db.backends.postgresql
   export SQL_PORT=5432
   ;;
 "sqlite3")
