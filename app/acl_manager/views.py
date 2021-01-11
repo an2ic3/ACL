@@ -84,20 +84,6 @@ class ACLAuthView(View):
 
 class BasicAuthView(View):
 
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+    def get(self, request: HttpRequest) -> HttpResponse:
 
-        if not (auth_header := request.headers.get('Authorization')):
-            response = HttpResponse(status=401)
-            response['WWW-Authenticate'] = 'Basic realm="ACL"'
-            return response
-
-        try:
-            _, basic_auth = auth_header.split(' ')
-            username, passwd = base64.b64decode(basic_auth).decode().split(':', maxsplit=1)
-        except (ValueError, binascii.Error):
-            return HttpResponseBadRequest()
-
-        if authenticate(request, username=username, password=passwd):
-           return HttpResponse(status=200)
-
-        return HttpResponseForbidden()
+        return HttpResponse()
