@@ -1,4 +1,4 @@
-ARG DBMS="postgres"
+ARG DBMS="mariadb"
 ARG AUTH="openldap"
 
 FROM python:3.9.0-alpine as builder
