@@ -100,4 +100,4 @@ class BasicAuthView(View):
         if authenticate(request, username=username, password=passwd):
            return HttpResponse(status=200)
 
-        return HttpResponseForbidden()
+        return HttpResponseForbidden('<h1>403 Forbidden</h1>', content_type='text/html')
