@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class BasicAuthMiddleware:
-    _EXCLUDED_URLS = ('admin:index', 'auth')
+    _EXCLUDED_URLS = ('admin:index', 'auth', 'checkauth')
 
     def __init__(self, get_response):
         self.get_response = get_response

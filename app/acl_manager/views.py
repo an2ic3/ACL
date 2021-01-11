@@ -98,6 +98,6 @@ class BasicAuthView(View):
             return HttpResponseBadRequest()
 
         if authenticate(request, username=username, password=passwd):
-            return HttpResponse()
+           return HttpResponse(status=200)
 
         return HttpResponseForbidden()
