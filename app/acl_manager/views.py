@@ -1,18 +1,21 @@
-from django.http import HttpResponse, HttpRequest, HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
+from django.http import HttpResponse, HttpRequest, HttpResponseNotFound, HttpResponseBadRequest, \
+    HttpResponseForbidden, HttpResponseRedirect
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.core.validators import validate_ipv46_address
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
-import binascii
-import base64
 
+from .decorator import basic_auth_required
 from .models import IP, Domain
 from .service.dns_lookup import DNSLookupService
 
 
 class InfoView(View):
 
+    @method_decorator(login_required)
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         try:
             ip_address = request.user.ip.address
@@ -26,6 +29,7 @@ class UpdateView(View):
     def __init__(self):
         self._dns_service = DNSLookupService()
 
+    @method_decorator(basic_auth_required)
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         if not (ip_address := request.GET.get('ip')) and not (domain := request.GET.get('domain')):
             return HttpResponseBadRequest()
@@ -84,6 +88,17 @@ class ACLAuthView(View):
 
 class BasicAuthView(View):
 
+    @method_decorator(login_required)
     def get(self, request: HttpRequest) -> HttpResponse:
-
         return HttpResponse()
+
+
+class LoginView(LoginView):
+    template_name = 'login.html'
+
+    def post(self, *args, **kwargs):
+        response = super().post(*args, **kwargs)
+
+        if not isinstance(response, HttpResponseRedirect):
+            return HttpResponse(status=401)
+        return response

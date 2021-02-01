@@ -3,25 +3,13 @@ import binascii
 import logging
 
 from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest
-from django.urls import reverse
 from django.contrib.auth import authenticate
-
 
 logger = logging.getLogger(__name__)
 
 
-class BasicAuthMiddleware:
-    _EXCLUDED_URLS = ('admin:index', 'auth')
-
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request: HttpRequest):
-        for url in self._EXCLUDED_URLS:
-            if not request.path.startswith(reverse(url)):
-                continue
-            return self.get_response(request)
-
+def basic_auth_required(func):
+    def wrapper(request: HttpRequest, *args, **kwargs):
         if not (auth_header := request.headers.get('Authorization')):
             response = HttpResponse(status=401)
             response['WWW-Authenticate'] = 'Basic realm="ACL"'
@@ -40,4 +28,5 @@ class BasicAuthMiddleware:
 
         request.user = user
 
-        return self.get_response(request)
+        return func(request, *args, **kwargs)
+    return wrapper
