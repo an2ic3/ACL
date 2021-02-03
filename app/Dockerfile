@@ -31,7 +31,7 @@ ARG AUTH
 ENV DBMS=${DBMS}
 
 # app config
-ENV SQL_USER=acl SQL_DATABASE=acl ALLOWED_HOSTS='0.0.0.0' DEBUG=0
+ENV SQL_USER=acl SQL_DATABASE=acl ALLOWED_HOSTS=acl DEBUG=0
 
 # create the app user and directories
 ENV HOME=/home/app APP_HOME=/home/app/web
