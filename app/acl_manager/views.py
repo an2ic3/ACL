@@ -60,8 +60,11 @@ class UpdateView(View):
 class ACLAuthView(View):
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-
-        if not (ip_header := request.headers.get("X-Forwarded-For")):
+        if request.headers.get("Cf-Connecting-Ip"):
+            ip_header = request.headers.get("Cf-Connecting-Ip")
+        elif request.headers.get("X-Forwarded-For"):
+            ip_header = request.headers.get("X-Forwarded-For")
+        else:
             return HttpResponseBadRequest()
 
         if not (host := request.headers.get("X-Forwarded-Host")):

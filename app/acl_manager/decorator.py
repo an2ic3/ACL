@@ -3,13 +3,16 @@ import binascii
 import logging
 
 from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 
 logger = logging.getLogger(__name__)
 
 
 def basic_auth_required(func):
     def wrapper(request: HttpRequest, *args, **kwargs):
+        if request.user.is_authenticated:
+            return func(request, *args, **kwargs)
+
         if not (auth_header := request.headers.get('Authorization')):
             response = HttpResponse(status=401)
             response['WWW-Authenticate'] = 'Basic realm="ACL"'
@@ -26,7 +29,7 @@ def basic_auth_required(func):
         if not user:
             return HttpResponse(status=401)
 
-        request.user = user
+        login(request, user)
 
         return func(request, *args, **kwargs)
     return wrapper
