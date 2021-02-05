@@ -84,6 +84,7 @@
                                         <div class="d-flex justify-content-{% if message.team %}start{% else %}end{% endif %} mb-4">
                                             <div class="msg_cotainer">
                                                 {{ message.content }}
+                                                <!-- TODO timestamp is not being displayed correctly if the message is too short -->
                                                 <span class="msg_time">{{ message.created|date:"H:i:s, d N Y" }}</span>
                                             </div>
                                         </div>

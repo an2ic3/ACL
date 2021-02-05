@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             name='Service',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.TextField()),
+                ('name', models.CharField(max_length=64)),
             ],
         ),
         migrations.CreateModel(

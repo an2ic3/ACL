@@ -1,5 +1,5 @@
 from django import forms
-from .models import Service
+from .models import Service, Ticket
 
 
 class TicketForm(forms.Form):
@@ -8,12 +8,12 @@ class TicketForm(forms.Form):
         'class': 'form-control',
     }), required=True)
 
-    service = forms.ChoiceField(
+    service = forms.ModelChoiceField(
         widget=forms.Select(attrs={
             'placeholder': 'Service',
             'class': 'form-control',
         }),
-        choices=[(p.id, p.name) for p in Service.objects.all()],
+        queryset=Service.objects.all(),
         required=True
     )
 
@@ -27,11 +27,7 @@ class TicketForm(forms.Form):
             'placeholder': 'Priority',
             'class': 'form-control',
         }),
-        choices=[
-            (1, "Low"),
-            (2, "Normal"),
-            (3, "High")
-        ],
+        choices=Ticket.PRIORITIES,
         required=True
     )
 
