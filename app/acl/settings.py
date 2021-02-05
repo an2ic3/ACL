@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'acl_manager.apps.AclManagerConfig',
+    'support.apps.SupportConfig',
 ]
 
 MIDDLEWARE = [
