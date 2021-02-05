@@ -82,10 +82,9 @@
                                     <div class="card-body msg_card_body">
                                         {% for message in form.messages %}
                                         <div class="d-flex justify-content-{% if message.team %}start{% else %}end{% endif %} mb-4">
-                                            <div class="msg_cotainer">
+                                            <div class="msg_cotainer" style="min-width: 20%;">
                                                 {{ message.content }}
-                                                <!-- TODO timestamp is not being displayed correctly if the message is too short -->
-                                                <span class="msg_time">{{ message.created|date:"H:i:s, d N Y" }}</span>
+                                                <div class="msg_time" style="width: 100%; text-align: {% if message.team %}left{% else %}right{% endif %};">{{ message.created|date:"H:i:s, d N Y" }}</div>
                                             </div>
                                         </div>
                                         {% endfor %}
@@ -107,55 +106,55 @@
                 </div>
             </div>
         </div>
-    </body>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-            crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-            crossorigin="anonymous"></script>
-    <script>
-        $('select[id="inputPriority"]').find('option[value="{{ form.priority }}"]').attr("selected",true);
-        $('select[id="inputService"]').find('option[value="{{ form.service }}"]').attr("selected",true);
-        $('select[id="inputStatus"]').find('option[value="{{ form.status }}"]').attr("selected",true);
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+                integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+                crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+                crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+                integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+                crossorigin="anonymous"></script>
+        <script>
+            $('select[id="inputPriority"]').find('option[value="{{ form.priority }}"]').attr("selected",true);
+            $('select[id="inputService"]').find('option[value="{{ form.service }}"]').attr("selected",true);
+            $('select[id="inputStatus"]').find('option[value="{{ form.status }}"]').attr("selected",true);
 
-        function getCookie(c_name) {
-            if (document.cookie.length > 0) {
-                c_start = document.cookie.indexOf(c_name + "=");
-                if (c_start != -1) {
-                    c_start = c_start + c_name.length + 1;
-                    c_end = document.cookie.indexOf(";", c_start);
-                    if (c_end == -1) c_end = document.cookie.length;
-                    return unescape(document.cookie.substring(c_start,c_end));
+            function getCookie(c_name) {
+                if (document.cookie.length > 0) {
+                    c_start = document.cookie.indexOf(c_name + "=");
+                    if (c_start != -1) {
+                        c_start = c_start + c_name.length + 1;
+                        c_end = document.cookie.indexOf(";", c_start);
+                        if (c_end == -1) c_end = document.cookie.length;
+                        return unescape(document.cookie.substring(c_start,c_end));
+                    }
                 }
+                return "";
             }
-            return "";
-        }
 
-        document.getElementById('sendMessage').addEventListener('click', function (e) {
-            e.preventDefault();
-            let content = document.getElementById('inputMessage').value;
-            if (content === undefined || content === "") {
-                return
-            }
-            fetch('{% url 'support_send_message' form.id %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json;charset=utf-8',
-                    "X-CSRFToken": getCookie('csrftoken'),
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                    "content": content,
-                })
-            }).then(data => {
-                if (data.status === 200) {
-                    location.reload();
+            document.getElementById('sendMessage').addEventListener('click', function (e) {
+                e.preventDefault();
+                let content = document.getElementById('inputMessage').value;
+                if (content === undefined || content === "") {
+                    return
                 }
+                fetch('{% url 'support_send_message' form.id %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8',
+                        "X-CSRFToken": getCookie('csrftoken'),
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        "content": content,
+                    })
+                }).then(data => {
+                    if (data.status === 200) {
+                        location.reload();
+                    }
+                });
             });
-        });
-    </script>
+        </script>
+    </body>
 </html>
