@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView
-from django.http import HttpResponse, HttpRequest, HttpResponseNotFound, HttpResponseBadRequest, \
-    HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest, HttpResponseForbidden
+from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.core.validators import validate_ipv46_address
@@ -13,15 +12,8 @@ from .models import IP, Domain
 from .service.dns_lookup import DNSLookupService
 
 
-class InfoView(View):
-
-    @method_decorator(login_required)
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        try:
-            ip_address = request.user.ip.address
-        except IP.DoesNotExist:
-            return HttpResponseNotFound()
-        return HttpResponse(ip_address)
+def index(request):
+    return redirect('profile')
 
 
 class UpdateView(View):
@@ -89,19 +81,9 @@ class ACLAuthView(View):
         return HttpResponseForbidden()
 
 
+# TODO add possibility to specify group
 class BasicAuthView(View):
 
     @method_decorator(login_required)
     def get(self, request: HttpRequest) -> HttpResponse:
         return HttpResponse()
-
-
-class LoginView(LoginView):
-    template_name = 'login.html'
-
-    def post(self, *args, **kwargs):
-        response = super().post(*args, **kwargs)
-
-        if not isinstance(response, HttpResponseRedirect):
-            return HttpResponse(status=401)
-        return response

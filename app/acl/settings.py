@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'acl_manager.apps.AclManagerConfig',
     'support.apps.SupportConfig',
+    'idm.apps.IdentityManagementConfig'
 ]
 
 MIDDLEWARE = [
@@ -201,6 +202,8 @@ if os.environ.get('LDAP_URI', False):
         "loggers": {"django_auth_ldap": {"level": "INFO", "handlers": ["console"]}},
     }
 
+
+LOGOUT_REDIRECT_URL = '/'
 
 # Custom
 SCHEDULE_UPDATE_TIME = os.environ.get('SCHEDULE_UPDATE_TIME', 15)  # in Minutes
