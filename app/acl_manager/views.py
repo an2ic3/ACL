@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest, HttpResponseForbidden
+from django.contrib.auth.views import LoginView
+from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -82,8 +83,17 @@ class ACLAuthView(View):
 
 
 # TODO add possibility to specify group
-class BasicAuthView(View):
+class BasicAuthView(LoginView):
+    template_name = 'login.html'
 
-    @method_decorator(login_required)
-    def get(self, request: HttpRequest) -> HttpResponse:
-        return HttpResponse()
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return HttpResponse()
+        return super(LoginView, self).get(request, *args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        response = super().post(*args, **kwargs)
+
+        if not isinstance(response, HttpResponseRedirect):
+            return HttpResponse(status=401)
+        return response
