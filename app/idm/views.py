@@ -16,11 +16,7 @@ def index(request):
 
 class LoginView(LoginView):
     template_name = 'login.html'
-
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('profile')
-        return super(LoginView, self).get(request, *args, **kwargs)
+    redirect_authenticated_user = True
 
     def post(self, *args, **kwargs):
         response = super().post(*args, **kwargs)
