@@ -87,9 +87,9 @@ class BasicAuthView(LoginView):
     template_name = 'login.html'
 
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return HttpResponse()
         response = super(LoginView, self).get(request, *args, **kwargs)
+        if request.user.is_authenticated:
+            return response
         response.status_code = 401
         return response
 
