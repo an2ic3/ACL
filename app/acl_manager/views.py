@@ -87,9 +87,10 @@ class BasicAuthView(LoginView):
     template_name = 'login.html'
 
     def get(self, request, *args, **kwargs):
-        response = super(LoginView, self).get(request, *args, **kwargs)
         if request.user.is_authenticated:
-            return response
+            return HttpResponse()
+
+        response = super(LoginView, self).get(request, *args, **kwargs)
         response.status_code = 401
         return response
 
@@ -97,5 +98,5 @@ class BasicAuthView(LoginView):
         response = super().post(*args, **kwargs)
 
         if not isinstance(response, HttpResponseRedirect):
-            return HttpResponse(status=401)
-        return response
+            return HttpResponseRedirect('/checkauth/')
+        return HttpResponse()
