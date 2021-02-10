@@ -90,9 +90,7 @@ class BasicAuthView(LoginView):
         if request.user.is_authenticated:
             return HttpResponse()
 
-        response = super(LoginView, self).get(request, *args, **kwargs)
-        response.status_code = 401
-        return response
+        return super(LoginView, self).get(request, *args, **kwargs)
 
     def post(self, *args, **kwargs):
         response = super().post(*args, **kwargs)
