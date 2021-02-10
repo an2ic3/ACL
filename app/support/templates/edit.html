@@ -79,7 +79,10 @@
                                         <div class="d-flex justify-content-{% if message.team %}start{% else %}end{% endif %} mb-4">
                                             <div class="msg_cotainer" style="min-width: 20%;">
                                                 {{ message.content }}
-                                                <div class="msg_time" style="width: 100%; text-align: {% if message.team %}left{% else %}right{% endif %};">{{ message.created|date:"H:i:s, d N Y" }}</div>
+                                                <div class="msg_time" id="{{ message.id }}" style="width: 100%; text-align: {% if message.team %}left{% else %}right{% endif %};"></div>
+                                                <script>
+                                                  document.getElementById("{{ message.id }}").value = new Intl.DateTimeFormat(navigator.language || navigator.userLanguage,{ dateStyle: 'short', timeStyle:'short' }).format(new Date('{{ message.created }}'));
+                                                </script>
                                             </div>
                                         </div>
                                         {% endfor %}
