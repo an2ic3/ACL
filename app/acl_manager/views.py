@@ -1,4 +1,5 @@
-from django.contrib.auth.decorators import login_required
+import logging
+
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import redirect
@@ -11,6 +12,8 @@ from django.contrib.auth.models import User
 from .decorator import basic_auth_required
 from .models import IP, Domain
 from .service.dns_lookup import DNSLookupService
+
+logger = logging.getLogger(__name__)
 
 
 def index(request):
@@ -88,13 +91,18 @@ class BasicAuthView(LoginView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
+            logger.debug("User %s is authenticated", request.user.username)
             return HttpResponse()
 
+        logger.debug("User is not authenticated")
         return super(LoginView, self).get(request, *args, **kwargs)
 
     def post(self, *args, **kwargs):
         response = super().post(*args, **kwargs)
 
         if not isinstance(response, HttpResponseRedirect):
+            logger.debug("Authentication Failed")
             return HttpResponseRedirect('/checkauth/')
+
+        logger.debug("authentication was successful")
         return HttpResponse()
