@@ -83,19 +83,8 @@ class ACLAuthView(View):
 
 
 # TODO add possibility to specify group
-class BasicAuthView(LoginView):
-    template_name = 'login.html'
+class BasicAuthView(View):
 
-    def get(self, request, *args, **kwargs):
-        response = super(LoginView, self).get(request, *args, **kwargs)
-        if request.user.is_authenticated:
-            return response
-        response.status_code = 401
-        return response
-
-    def post(self, *args, **kwargs):
-        response = super().post(*args, **kwargs)
-
-        if not isinstance(response, HttpResponseRedirect):
-            return HttpResponse(status=401)
-        return response
+    @method_decorator(basic_auth_required)
+    def get(self, request: HttpRequest) -> HttpResponse:
+        return HttpResponse()
