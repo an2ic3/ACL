@@ -1,4 +1,5 @@
-from django.contrib.auth.decorators import login_required
+import logging
+
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import redirect
@@ -11,6 +12,8 @@ from django.contrib.auth.models import User
 from .decorator import basic_auth_required
 from .models import IP, Domain
 from .service.dns_lookup import DNSLookupService
+
+logger = logging.getLogger(__name__)
 
 
 def index(request):
