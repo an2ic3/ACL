@@ -161,6 +161,7 @@ if os.environ.get('LDAP_URI', False):
     AUTH_LDAP_SERVER_URI = os.environ['LDAP_URI']
     AUTH_LDAP_BIND_DN = os.environ['LDAP_BIND_DN']
     AUTH_LDAP_BIND_PASSWORD = os.environ['LDAP_BIND_PASS']
+    AUTH_LDAP_USERS = os.environ['LDAP_USERS']
     AUTH_LDAP_USER_SEARCH = LDAPSearch(
         os.environ['LDAP_USERS'],
         ldap.SCOPE_SUBTREE,

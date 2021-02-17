@@ -19,5 +19,4 @@ class ChangeSshPublicKeyForm(forms.Form):
     public_key = forms.CharField(max_length=128, widget=forms.Textarea(attrs={
         'placeholder': 'SSH Public Key',
         'class': 'form-control',
-        'disabled': True,
     }), required=True)

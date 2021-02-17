@@ -9,6 +9,8 @@ from django.shortcuts import render, redirect
 from .forms import ChangePasswordForm, ChangeSshPublicKeyForm
 from acl_manager.models import Service, IP
 
+from .service import LDAPService
+
 
 def index(request):
     return redirect('profile')
@@ -63,17 +65,17 @@ def profile(request):
         Q(users=request.user) | Q(groups__in=request.user.groups.all())
     ).all()
 
-    # TODO get ldap attribute memberOf
-    data['ldap_member_of'] = []
-    # TODO get ldap attribute givenName
-    data['givenName'] = ''
-    # TODO get ldap attribute sn
-    data['sn'] = ''
+    service = LDAPService(request.user.username)
+
+    data['ldap_member_of'] = [s.decode() for s in service.get_attr('memberOf', default=[])]
+    data['givenName'] = service.get_attr('givenName')[0].decode()
+    data['sn'] = service.get_attr('sn')[0].decode()
 
     public_key_form = ChangeSshPublicKeyForm()
-    # TODO get ldap attribute sshPublicKey
-    public_key_form.fields['public_key'].initial = ''
+    public_key_form.fields['public_key'].initial = service.get_attr('sshPublicKey')[0].decode()
     data['changeSshPublicKeyForm'] = public_key_form
+
+    service.close()
 
     return render(request, 'profile.html', context=data)
 
@@ -83,7 +85,9 @@ def update_password(request):
     if 'password' not in data:
         return HttpResponseBadRequest()
 
-    # TODO set ldap attribute userPassword
+    service = LDAPService(request.user.username)
+    service.set_attr('userPassword', data.get('password'))
+    service.close()
 
     return HttpResponse()
 
@@ -93,6 +97,8 @@ def update_pubkey(request):
     if 'public_key' not in data:
         return HttpResponseBadRequest()
 
-    # TODO set ldap attribute sshPublicKey
+    service = LDAPService(request.user.username)
+    service.set_attr('sshPublicKey', data.get('public_key'))
+    service.close()
 
     return HttpResponse()
